@@ -25,8 +25,8 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap"
 })
 
-export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
-  const { locale } = params
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params
   const t = await getTranslations({ locale, namespace: "metadata" })
   
   return {
@@ -40,9 +40,9 @@ export default async function LocaleLayout({
   params
 }: {
   children: React.ReactNode
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }) {
-  const { locale } = params
+  const { locale } = await params
   
   // Ensure that the incoming locale is valid
   if (!routing.locales.includes(locale as any)) {
