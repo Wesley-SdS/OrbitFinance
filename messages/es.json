@@ -5,6 +5,7 @@
   },
   "common": {
     "loading": "Cargando...",
+    "signingOut": "Cerrando sesión...",
     "save": "Guardar",
     "cancel": "Cancelar",
     "delete": "Eliminar",

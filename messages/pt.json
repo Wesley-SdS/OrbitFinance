@@ -5,6 +5,7 @@
   },
   "common": {
     "loading": "Carregando...",
+    "signingOut": "Saindo...",
     "save": "Salvar",
     "cancel": "Cancelar",
     "delete": "Excluir",
@@ -81,6 +82,7 @@
     "new": "Nova Transação",
     "edit": "Editar Transação",
     "type": "Tipo",
+    "transactionType": "Tipo de Transação",
     "amount": "Valor",
     "date": "Data",
     "description": "Descrição",
