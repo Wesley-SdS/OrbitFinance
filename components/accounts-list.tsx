@@ -3,8 +3,8 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { useSession } from "@/lib/auth-client"
-import { prisma } from "@/lib/prisma"
 import { Button } from "@/components/ui/button"
+import { Link } from "@/lib/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { formatCurrency, decimalToNumber } from "@/lib/utils"
@@ -41,11 +41,10 @@ export function AccountsList({ accounts: initialAccounts }: AccountsListProps) {
 
   const fetchAccounts = async () => {
     try {
-      const accounts = await prisma.financialAccount.findMany({
-        where: { userId: session!.user.id },
-        orderBy: { createdAt: "desc" },
-      })
-      setAccounts(accounts)
+      const res = await fetch("/api/accounts", { cache: "no-store" })
+      if (!res.ok) throw new Error("Failed to load accounts")
+      const data = await res.json()
+      setAccounts(data.accounts as FinancialAccount[])
     } catch (error) {
       console.error("Failed to fetch accounts:", error)
     } finally {
@@ -55,7 +54,8 @@ export function AccountsList({ accounts: initialAccounts }: AccountsListProps) {
 
   const handleDelete = async (id: string) => {
     try {
-      await prisma.account.delete({ where: { id } })
+      const res = await fetch(`/api/accounts/${id}`, { method: "DELETE" })
+      if (!res.ok) throw new Error("Failed to delete account")
       fetchAccounts()
     } catch (error) {
       console.error("Failed to delete account:", error)
@@ -115,8 +115,10 @@ export function AccountsList({ accounts: initialAccounts }: AccountsListProps) {
                 {t("accounts.createdOn")} {new Date(account.createdAt).toLocaleDateString()}
               </div>
               <div className="flex space-x-2">
-                <Button variant="outline" size="sm">
-                  {t("common.edit")}
+                <Button variant="outline" size="sm" asChild>
+                  <Link href={`/dashboard/accounts/${account.id}/edit`}>
+                    {t("common.edit")}
+                  </Link>
                 </Button>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>

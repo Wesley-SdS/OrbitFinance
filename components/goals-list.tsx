@@ -3,8 +3,9 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { useSession } from "@/lib/auth-client"
-import { prisma } from "@/lib/prisma"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
+import { Link } from "@/lib/navigation"
 import { Badge } from "@/components/ui/badge"
 import { formatCurrency, decimalToNumber, calculatePercentage } from "@/lib/utils"
 import type { Goal } from "@prisma/client"
@@ -24,11 +25,10 @@ export function GoalsList({ goals: initialGoals }: { goals?: Goal[] }) {
 
   const fetchGoals = async () => {
     try {
-      const fetchedGoals = await prisma.goal.findMany({
-        where: { userId: session!.user.id },
-        orderBy: { createdAt: "desc" },
-      })
-      setGoals(fetchedGoals)
+      const res = await fetch("/api/goals", { cache: "no-store" })
+      if (!res.ok) throw new Error("Failed to load goals")
+      const data = await res.json()
+      setGoals(data.goals as Goal[])
     } catch (error) {
       console.error("Failed to fetch goals:", error)
     } finally {
@@ -38,10 +38,12 @@ export function GoalsList({ goals: initialGoals }: { goals?: Goal[] }) {
 
   const handleDelete = async (id: string) => {
     try {
-      await prisma.goal.delete({ where: { id } })
+      const res = await fetch(`/api/goals/${id}`, { method: "DELETE" })
+      if (!res.ok) throw new Error("Failed to delete goal")
       fetchGoals()
     } catch (error) {
       console.error("Failed to delete goal:", error)
+      toast?.error?.("Failed to delete goal")
     }
   }
 
@@ -71,8 +73,10 @@ export function GoalsList({ goals: initialGoals }: { goals?: Goal[] }) {
                 <h3 className="font-medium">{goal.name}</h3>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm">
-                  {t("common.edit")}
+                <Button variant="outline" size="sm" asChild>
+                  <Link href={`/dashboard/goals/${goal.id}/edit`}>
+                    {t("common.edit")}
+                  </Link>
                 </Button>
                 <Button variant="destructive" size="sm" onClick={() => handleDelete(goal.id)}>
                   {t("common.delete")}

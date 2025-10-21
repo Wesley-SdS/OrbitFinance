@@ -3,8 +3,8 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { useSession } from "@/lib/auth-client"
-import { prisma } from "@/lib/prisma"
 import { Button } from "@/components/ui/button"
+import { Link } from "@/lib/navigation"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
@@ -39,14 +39,19 @@ export function CategoryForm({ category, onSuccess }: { category?: Category; onS
       }
 
       if (category?.id) {
-        await prisma.category.update({
-          where: { id: category.id },
-          data: categoryData,
+        const res = await fetch(`/api/categories/${category.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(categoryData),
         })
+        if (!res.ok) throw new Error(t("common.error"))
       } else {
-        await prisma.category.create({
-          data: categoryData,
+        const res = await fetch(`/api/categories`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(categoryData),
         })
+        if (!res.ok) throw new Error(t("common.error"))
       }
 
       onSuccess?.()
@@ -123,11 +128,12 @@ export function CategoriesList({
 
   const fetchCategories = async () => {
     try {
-      const fetchedCategories = await prisma.category.findMany({
-        where: { userId: session!.user.id },
-        orderBy: { createdAt: "desc" },
-      })
-      setCategories(fetchedCategories)
+      const url = new URL(`/api/categories`, window.location.origin)
+      if (filterType) url.searchParams.set("type", filterType)
+      const res = await fetch(url.toString(), { cache: "no-store" })
+      if (!res.ok) throw new Error("Failed to load categories")
+      const data = await res.json()
+      setCategories(data.categories as Category[])
     } catch (error) {
       console.error("Failed to fetch categories:", error)
     } finally {
@@ -137,7 +143,8 @@ export function CategoriesList({
 
   const handleDelete = async (id: string) => {
     try {
-      await prisma.category.delete({ where: { id } })
+      const res = await fetch(`/api/categories/${id}`, { method: "DELETE" })
+      if (!res.ok) throw new Error("Failed to delete category")
       fetchCategories()
     } catch (error) {
       console.error("Failed to delete category:", error)
@@ -176,8 +183,10 @@ export function CategoriesList({
             </div>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm">
-              {t("common.edit")}
+            <Button variant="outline" size="sm" asChild>
+              <Link href={`/dashboard/categories/${category.id}/edit`}>
+                {t("common.edit")}
+              </Link>
             </Button>
             <Button variant="destructive" size="sm" onClick={() => handleDelete(category.id)}>
               {t("common.delete")}

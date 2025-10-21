@@ -13,9 +13,7 @@ export function InsightsList({ insights }: { insights: AiInsight[] }) {
 
   const handleMarkAsRead = async (id: string) => {
     try {
-      const response = await fetch(`/api/insights/${id}/read`, {
-        method: "PATCH",
-      })
+      const response = await fetch(`/api/insights/${id}`, { method: "PATCH" })
       if (response.ok) {
         setLocalInsights((prev) => prev.map((insight) => (insight.id === id ? { ...insight, isRead: true } : insight)))
       }
