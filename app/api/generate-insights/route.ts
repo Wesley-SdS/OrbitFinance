@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { generateFinancialInsights } from "@/lib/ai/models"
+import { revalidateTag } from "next/cache"
+import { userTag } from "@/lib/cache-tags"
 
 export async function POST(request: NextRequest) {
   try {
@@ -44,6 +46,7 @@ export async function POST(request: NextRequest) {
       })),
     })
 
+    revalidateTag(userTag(session.user.id, "insights"))
     return NextResponse.json({
       message: "Insights generated successfully",
       insightsCreated: savedInsights.count,

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { revalidateTag } from "next/cache"
+import { userTag } from "@/lib/cache-tags"
 
 export async function GET(request: NextRequest) {
   try {
@@ -55,6 +57,7 @@ export async function POST(request: NextRequest) {
       }
     })
 
+    revalidateTag(userTag(session.user.id, "categories"))
     return NextResponse.json({ category })
   } catch (error) {
     console.error("Failed to create category:", error)

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { revalidateTag } from "next/cache"
+import { userTag } from "@/lib/cache-tags"
 
 export async function GET(request: NextRequest) {
   try {
@@ -39,24 +41,42 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { amount, description, notes, type, financialAccountId, categoryId, date } = body
 
-    const transaction = await prisma.transaction.create({
-      data: {
-        userId: session.user.id,
-        amount,
-        description,
-        notes,
-        type,
-        financialAccountId,
-        categoryId,
-        date: new Date(date),
-      },
-      include: {
-        financialAccount: true,
-        category: true,
+    const result = await prisma.$transaction(async (tx) => {
+      const transaction = await tx.transaction.create({
+        data: {
+          userId: session.user.id,
+          amount,
+          description,
+          notes,
+          type,
+          financialAccountId,
+          categoryId,
+          date: new Date(date),
+        },
+        include: {
+          financialAccount: true,
+          category: true,
+        },
+      })
+
+      if (type === "income") {
+        await tx.financialAccount.update({
+          where: { id: financialAccountId, userId: session.user.id },
+          data: { balance: { increment: amount } },
+        })
+      } else if (type === "expense") {
+        await tx.financialAccount.update({
+          where: { id: financialAccountId, userId: session.user.id },
+          data: { balance: { decrement: amount } },
+        })
       }
+
+      return transaction
     })
 
-    return NextResponse.json({ transaction })
+    revalidateTag(userTag(session.user.id, "transactions"))
+    revalidateTag(userTag(session.user.id, "accounts"))
+    return NextResponse.json({ transaction: result })
   } catch (error) {
     console.error("Failed to create transaction:", error)
     return new NextResponse("Internal Server Error", { status: 500 })
