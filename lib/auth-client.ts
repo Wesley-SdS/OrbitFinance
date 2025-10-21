@@ -2,11 +2,7 @@
 
 import { createAuthClient } from "better-auth/react"
 
-export const authClient = createAuthClient({
-  baseURL:
-    process.env.NODE_ENV === "production"
-      ? process.env.BETTER_AUTH_URL || "https://localhost:3000"
-      : "http://localhost:3000",
-})
+// Use same-origin relative requests to avoid cross-origin latency/misconfig
+export const authClient = createAuthClient({})
 
 export const { signIn, signUp, signOut, useSession } = authClient
