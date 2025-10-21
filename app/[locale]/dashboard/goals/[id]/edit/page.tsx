@@ -1,31 +1,15 @@
-import { auth } from "@/lib/auth"
-import { headers } from "next/headers"
-import { prisma } from "@/lib/prisma"
-import { GoalForm } from "@/components/goal-form"
-import { notFound } from "next/navigation"
+import { getSession } from "@/lib/session"
+import { GoalEditLoader } from "@/components/goal-edit-loader"
 import { redirect } from "@/lib/navigation"
 import { getTranslations } from "next-intl/server"
 
 export default async function EditGoalPage({ params }: { params: { id: string } }) {
   const { id } = params
 
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  })
+  const session = await getSession()
 
   if (!session?.user) {
     redirect("/auth/login")
-  }
-
-  const goal = await prisma.goal.findFirst({
-    where: {
-      id: id,
-      userId: session.user.id,
-    },
-  })
-
-  if (!goal) {
-    notFound()
   }
 
   return (
@@ -35,7 +19,7 @@ export default async function EditGoalPage({ params }: { params: { id: string } 
         <p className="text-muted-foreground">{(await getTranslations())("goals.description")}</p>
       </div>
 
-      <GoalForm goal={goal} />
+      <GoalEditLoader id={id} />
     </div>
   )
 }
