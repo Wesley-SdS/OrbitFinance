@@ -1,31 +1,16 @@
-import { auth } from "@/lib/auth"
-import { headers } from "next/headers"
+import { getSession } from "@/lib/session"
 import { redirect } from "next/navigation"
-import { prisma } from "@/lib/prisma"
 import { TransactionFormClient } from "@/components/transaction-form-client"
 import { Link } from "@/lib/navigation"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 
 export default async function NewTransactionPage() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  })
+  const session = await getSession()
 
   if (!session?.user) {
     redirect("/auth/login")
   }
-
-  const [accounts, categories] = await Promise.all([
-    prisma.financialAccount.findMany({
-      where: { userId: session.user.id },
-      orderBy: { createdAt: "desc" },
-    }),
-    prisma.category.findMany({
-      where: { userId: session.user.id },
-      orderBy: { createdAt: "desc" },
-    }),
-  ])
 
   return (
     <div className="container max-w-2xl mx-auto py-8">
@@ -41,10 +26,7 @@ export default async function NewTransactionPage() {
       </div>
 
       <div className="bg-card p-6 rounded-lg border">
-        <TransactionFormClient 
-          accounts={accounts}
-          categories={categories}
-        />
+        <TransactionFormClient />
       </div>
     </div>
   )
