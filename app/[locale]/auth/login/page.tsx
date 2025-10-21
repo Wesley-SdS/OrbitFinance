@@ -27,11 +27,7 @@ export default function LoginPage() {
     setError(null)
 
     try {
-      const result = await signIn.email({
-        email,
-        password,
-        callbackURL: "/dashboard",
-      })
+      const result = await signIn.email({ email, password, callbackURL: "/dashboard" })
 
       if (result.error) {
         // Handle specific Better Auth errors
@@ -44,8 +40,8 @@ export default function LoginPage() {
       }
 
       toast.success("Login realizado com sucesso!")
-      router.push("/dashboard")
-      router.refresh()
+      router.replace("/dashboard")
+      return
     } catch (error: unknown) {
       console.error("Login error:", error)
       toast.error("Erro inesperado ao fazer login")

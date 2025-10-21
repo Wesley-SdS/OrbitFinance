@@ -62,7 +62,7 @@ export default function SignUpPage() {
       }
 
       toast.success("Conta criada com sucesso!")
-      router.push("/auth/sign-up-success")
+      router.replace("/auth/sign-up-success")
     } catch (error: unknown) {
       console.error("Sign up error:", error)
       toast.error("Erro inesperado ao criar conta")
