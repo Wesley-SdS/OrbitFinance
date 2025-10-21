@@ -1,0 +1,255 @@
+{
+  "metadata": {
+    "title": "OrbiFinance",
+    "description": "Sistema de finanzas personales con IA"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "export": "Exportar",
+    "signOut": "Cerrar sesión",
+    "appName": "OrbiFinance",
+    "changeLanguage": "Cambiar idioma",
+    "noData": "No hay datos disponibles",
+    "error": "Ocurrió un error",
+    "new": "Nuevo"
+  },
+  "nav": {
+    "dashboard": "Panel",
+    "transactions": "Transacciones",
+    "accounts": "Cuentas",
+    "categories": "Categorías",
+    "goals": "Metas",
+    "insights": "Insights IA",
+    "reports": "Informes"
+  },
+  "auth": {
+    "login": "Iniciar sesión",
+    "signUp": "Registrarse",
+    "welcomeBack": "Bienvenido de nuevo",
+    "enterCredentials": "Ingresa tus credenciales para acceder a tu cuenta",
+    "createAccountTitle": "Crear una cuenta",
+    "createAccountSubtitle": "Comienza a gestionar tus finanzas con insights de IA",
+    "fullName": "Nombre Completo",
+    "fullNamePlaceholder": "Juan Pérez",
+    "emailPlaceholder": "nombre@ejemplo.com",
+    "signingIn": "Iniciando sesión...",
+    "createAccount": "Crear cuenta",
+    "creatingAccount": "Creando cuenta...",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar Contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "noAccount": "¿No tienes una cuenta?",
+    "hasAccount": "¿Ya tienes una cuenta?",
+    "checkEmail": "Revisa tu correo",
+    "emailSent": "Te hemos enviado un correo de confirmación. Por favor, revisa tu bandeja de entrada y haz clic en el enlace para verificar tu cuenta."
+  },
+  "dashboard": {
+    "title": "Panel",
+    "welcome": "Bienvenido de nuevo",
+    "overview": "Resumen Financiero",
+    "totalBalance": "Saldo Total",
+    "income": "Ingresos",
+    "expenses": "Gastos",
+    "netAmount": "Monto Neto",
+    "recentTransactions": "Transacciones Recientes",
+    "quickActions": "Acciones Rápidas",
+    "addTransaction": "Agregar Transacción",
+    "addAccount": "Agregar Cuenta",
+    "addGoal": "Agregar Meta",
+    "accountsCount": "En {count} cuentas",
+    "activeGoals": "Metas Activas",
+    "financialObjectives": "Objetivos financieros",
+    "last30Days": "Últimos 30 días",
+    "connectedAccounts": "Cuentas conectadas",
+    "incomeVsExpenses": "Ingresos vs Gastos",
+    "expensesByCategory": "Gastos por Categoría",
+    "sixMonthTrend": "Tendencia de 6 Meses",
+    "income": "Ingresos",
+    "expenses": "Gastos"
+  },
+  "transactions": {
+    "title": "Transacciones",
+    "description": "Gestiona tus ingresos y gastos",
+    "new": "Nueva Transacción",
+    "edit": "Editar Transacción",
+    "type": "Tipo",
+    "amount": "Monto",
+    "date": "Fecha",
+    "description": "Descripción",
+    "account": "Cuenta",
+    "category": "Categoría",
+    "notes": "Notas",
+    "notesPlaceholder": "Agrega cualquier nota adicional",
+    "income": "Ingreso",
+    "expense": "Gasto",
+    "all": "Todas",
+    "noTransactions": "No hay transacciones aún",
+    "startAdding": "Comienza agregando tu primera transacción",
+    "yourLatestActivity": "Tu actividad financiera reciente",
+    "confirmDelete": "¿Está seguro de que desea eliminar esta transacción?"
+  },
+  "accounts": {
+    "title": "Cuentas",
+    "description": "Gestiona tus cuentas financieras",
+    "new": "Nueva Cuenta",
+    "edit": "Editar Cuenta",
+    "name": "Nombre de la Cuenta",
+    "type": "Tipo de Cuenta",
+    "balance": "Saldo",
+    "currency": "Moneda",
+    "color": "Color",
+    "icon": "Icono",
+    "noAccounts": "No hay cuentas aún",
+    "startAdding": "Comienza agregando tu primera cuenta",
+    "types": {
+      "checking": "Cuenta Corriente",
+      "savings": "Ahorros",
+      "credit": "Tarjeta de Crédito",
+      "investment": "Inversión",
+      "cash": "Efectivo",
+      "other": "Otro"
+    },
+    "active": "Cuenta activa",
+    "createdOn": "Creado el",
+    "deleteTitle": "Eliminar cuenta",
+    "deleteConfirm": "¿Está seguro de que desea eliminar esta cuenta? Esta acción no se puede deshacer."
+  },
+  "categories": {
+    "title": "Categorías",
+    "description": "Organiza tus transacciones",
+    "new": "Nueva Categoría",
+    "edit": "Editar Categoría",
+    "name": "Nombre de la Categoría",
+    "type": "Tipo",
+    "transactionType": "Tipo de Transacción",
+    "color": "Color",
+    "icon": "Icono",
+    "noCategories": "No hay categorías aún",
+    "startAdding": "Comienza agregando tu primera categoría"
+  },
+  "goals": {
+    "title": "Metas Financieras",
+    "description": "Rastrea tus metas de ahorro",
+    "new": "Nueva Meta",
+    "edit": "Editar Meta",
+    "name": "Nombre de la Meta",
+    "targetAmount": "Monto Objetivo",
+    "currentAmount": "Monto Actual",
+    "deadline": "Fecha Límite",
+    "status": "Estado",
+    "active": "Activa",
+    "completed": "Completada",
+    "progress": "Progreso",
+    "noGoals": "No hay metas aún",
+    "startAdding": "Comienza estableciendo tu primera meta financiera",
+    "markComplete": "Marcar como Completada",
+    "updateProgress": "Actualizar Progreso"
+  },
+  "insights": {
+    "title": "Insights IA",
+    "description": "Consejos financieros personalizados con IA",
+    "generate": "Generar Nuevos Insights",
+    "generating": "Generando insights...",
+    "noInsights": "No hay insights aún",
+    "startGenerating": "Haz clic en el botón de arriba para generar insights financieros personalizados",
+    "types": {
+      "spending": "Patrón de Gastos",
+      "saving": "Consejo de Ahorro",
+      "budget": "Alerta de Presupuesto",
+      "goal": "Progreso de Meta"
+    },
+    "priority": {
+      "high": "Alta",
+      "medium": "Media",
+      "low": "Baja"
+    },
+    "markAsRead": "Marcar como leído"
+  },
+  "reports": {
+    "title": "Informes",
+    "description": "Exporta tus datos financieros en formato CSV o PDF",
+    "csv": "Exportar CSV",
+    "pdf": "Exportar PDF",
+    "csvDescription": "Exporta datos de transacciones en formato de hoja de cálculo para análisis",
+    "pdfDescription": "Genera un informe PDF formateado de tu resumen financiero",
+    "startDate": "Fecha de Inicio",
+    "endDate": "Fecha de Fin",
+    "transactionType": "Tipo de Transacción",
+    "allTransactions": "Todas las Transacciones",
+    "incomeOnly": "Solo Ingresos",
+    "expensesOnly": "Solo Gastos",
+    "quickExport": "Opciones de Exportación Rápida",
+    "currentMonth": "Transacciones del Mes Actual",
+    "currentMonthDesc": "Todas las transacciones de este mes",
+    "lastThreeMonths": "Últimos 3 Meses",
+    "lastThreeMonthsDesc": "Resumen financiero trimestral",
+    "yearToDate": "Año hasta la Fecha",
+    "yearToDateDesc": "Todas las transacciones de este año",
+    "exporting": "Exportando..."
+  },
+  "home": {
+    "signIn": "Iniciar sesión",
+    "getStarted": "Comenzar",
+    "title": "Tu Compañero Financiero con IA",
+    "description": "Toma el control de tus finanzas con insights inteligentes, seguimiento automatizado y recomendaciones personalizadas impulsadas por IA.",
+    "startForFree": "Comenzar gratis",
+    "features": {
+      "analytics": {
+        "title": "Análisis Inteligentes",
+        "description": "Visualiza tus patrones de gasto con gráficos interactivos e informes detallados."
+      },
+      "aiInsights": {
+        "title": "Insights de IA",
+        "description": "Obtén consejos financieros personalizados y recomendaciones de gasto impulsados por IA."
+      },
+      "multiAccount": {
+        "title": "Múltiples Cuentas",
+        "description": "Gestiona múltiples cuentas, tarjetas de crédito y billeteras todo en un solo lugar."
+      },
+      "goalTracking": {
+        "title": "Seguimiento de Metas",
+        "description": "Establece metas financieras y sigue tu progreso con indicadores visuales."
+      },
+      "detailedReports": {
+        "title": "Informes Detallados",
+        "description": "Exporta tus datos financieros a CSV o PDF para temporada de impuestos y mantenimiento de registros."
+      },
+      "multiLanguage": {
+        "title": "Multi-Idioma",
+        "description": "Disponible en inglés, portugués y español para accesibilidad global."
+      }
+    },
+    "testimonials": {
+      "title": "Lo Que Dicen Nuestros Usuarios",
+      "subtitle": "Descubre cómo OrbiFinance está transformando la vida financiera de miles de personas"
+    },
+    "cta": {
+      "title": "¿Listo para Transformar tus Finanzas?",
+      "description": "Únete a miles de usuarios que ya están controlando su futuro financiero con el poder de la inteligencia artificial.",
+      "getStarted": "Comenzar Gratis",
+      "seeDemo": "Ver Demostración"
+    },
+    "stats": {
+      "activeUsers": "Usuarios Activos",
+      "activeUsersDesc": "Personas transformando sus finanzas",
+      "managed": "Gestionados",
+      "managedDesc": "Volumen total de transacciones",
+      "rating": "Calificación",
+      "ratingDesc": "Promedio de satisfacción del usuario"
+    },
+    "footer": {
+      "copyright": "© 2025 OrbiFinance. Parte de la plataforma OrbitMind.",
+      "privacy": "Privacidad",
+      "terms": "Términos",
+      "contact": "Contacto"
+    }
+  }
+}
