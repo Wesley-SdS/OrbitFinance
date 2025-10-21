@@ -1,7 +1,6 @@
-import { auth } from "@/lib/auth"
-import { headers } from "next/headers"
-import { prisma } from "@/lib/prisma"
+import { getSession } from "@/lib/session"
 import { CategoriesList } from "@/components/categories-list"
+import { getCategoriesCached } from "@/lib/cached"
 import { Button } from "@/components/ui/button"
 import { Link } from "@/lib/navigation"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -9,25 +8,14 @@ import { redirect } from "@/lib/navigation"
 import { getTranslations } from "next-intl/server"
 
 export default async function CategoriesPage() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  })
+  const session = await getSession()
 
   if (!session?.user) {
     redirect("/auth/login")
   }
 
-  const categories = await prisma.category.findMany({
-    where: {
-      userId: session.user.id,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  })
-
-  const incomeCategories = categories.filter((c) => c.type === "income")
-  const expenseCategories = categories.filter((c) => c.type === "expense")
+  const expenseCategories = await getCategoriesCached(session.user.id, "expense")
+  const incomeCategories = await getCategoriesCached(session.user.id, "income")
 
   const t = await getTranslations()
   return (
@@ -60,10 +48,10 @@ export default async function CategoriesPage() {
           <TabsTrigger value="income">{t("transactions.income")}</TabsTrigger>
         </TabsList>
         <TabsContent value="expense" className="mt-6">
-          <CategoriesList categories={expenseCategories} type="expense" />
+          <CategoriesList categories={expenseCategories as any} type="expense" />
         </TabsContent>
         <TabsContent value="income" className="mt-6">
-          <CategoriesList categories={incomeCategories} type="income" />
+          <CategoriesList categories={incomeCategories as any} type="income" />
         </TabsContent>
       </Tabs>
     </div>
