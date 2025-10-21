@@ -5,8 +5,8 @@ import { TransactionForm } from "@/components/transaction-form"
 import type { FinancialAccount, Category } from "@prisma/client"
 
 interface TransactionFormClientProps {
-  accounts: FinancialAccount[]
-  categories: Category[]
+  accounts?: FinancialAccount[]
+  categories?: Category[]
   transaction?: any
 }
 

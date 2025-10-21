@@ -29,7 +29,7 @@ export function LanguageSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon" className="hover-glow border border-transparent rounded-md cursor-pointer">
           <Globe className="h-5 w-5" />
           <span className="sr-only">{t("changeLanguage")}</span>
         </Button>

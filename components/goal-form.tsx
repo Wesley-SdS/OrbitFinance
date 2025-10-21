@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { useSession } from "@/lib/auth-client"
-import { prisma } from "@/lib/prisma"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -45,14 +45,19 @@ export function GoalForm({ goal, onSuccess }: { goal?: Goal; onSuccess?: () => v
       }
 
       if (goal?.id) {
-        await prisma.goal.update({
-          where: { id: goal.id },
-          data: goalData,
+        const res = await fetch(`/api/goals/${goal.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(goalData),
         })
+        if (!res.ok) throw new Error(t("common.error"))
       } else {
-        await prisma.goal.create({
-          data: goalData,
+        const res = await fetch(`/api/goals`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(goalData),
         })
+        if (!res.ok) throw new Error(t("common.error"))
       }
 
       onSuccess?.()
@@ -147,11 +152,10 @@ export function GoalsList() {
 
   const fetchGoals = async () => {
     try {
-      const goals = await prisma.goal.findMany({
-        where: { userId: session!.user.id },
-        orderBy: { createdAt: "desc" },
-      })
-      setGoals(goals)
+      const res = await fetch("/api/goals", { cache: "no-store" })
+      if (!res.ok) throw new Error("Failed to load goals")
+      const data = await res.json()
+      setGoals(data.goals as Goal[])
     } catch (error) {
       console.error("Failed to fetch goals:", error)
     } finally {
@@ -161,10 +165,12 @@ export function GoalsList() {
 
   const handleDelete = async (id: string) => {
     try {
-      await prisma.goal.delete({ where: { id } })
+      const res = await fetch(`/api/goals/${id}`, { method: "DELETE" })
+      if (!res.ok) throw new Error("Failed to delete goal")
       fetchGoals()
     } catch (error) {
       console.error("Failed to delete goal:", error)
+      toast?.error?.("Failed to delete goal")
     }
   }
 
