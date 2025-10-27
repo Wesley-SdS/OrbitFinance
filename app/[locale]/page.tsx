@@ -12,8 +12,8 @@ import { CTASection, CTAContent } from "@/components/sections/cta-section"
 import { Footer } from "@/components/layout/footer"
 import { Button } from "@/components/ui/button"
 
-export default async function HomePage({ params }: { params: { locale: string } }) {
-  const { locale } = params
+export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
   
   // Enable static rendering
   setRequestLocale(locale)

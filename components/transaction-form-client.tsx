@@ -2,11 +2,11 @@
 
 import { useRouter } from "next/navigation"
 import { TransactionForm } from "@/components/transaction-form"
-import type { FinancialAccount, Category } from "@prisma/client"
+import type { CategoryBasic, AccountBasic } from "@/lib/types"
 
 interface TransactionFormClientProps {
-  accounts?: FinancialAccount[]
-  categories?: Category[]
+  accounts?: AccountBasic[]
+  categories?: CategoryBasic[]
   transaction?: any
 }
 
