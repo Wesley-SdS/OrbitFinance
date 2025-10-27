@@ -14,6 +14,7 @@ model User {
   emailVerified Boolean        @default(false) @map("email_verified")
   name          String?
   image         String?
+  phone         String?        @unique
   createdAt     DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt     DateTime       @updatedAt @map("updated_at") @db.Timestamptz(6)
 
@@ -28,6 +29,11 @@ model User {
   transactions      Transaction[]
   goals             Goal[]
   aiInsights        AiInsight[]
+  // Organizer & messaging
+  reminders         Reminder[]
+  messageLogs       MessageLog[]
+  tasks             Task[]
+  events            Event[]
 
   @@map("users")
 }
@@ -136,6 +142,7 @@ model Transaction {
   user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   financialAccount FinancialAccount @relation(fields: [financialAccountId], references: [id], onDelete: Cascade)
   category         Category         @relation(fields: [categoryId], references: [id])
+  attachments      Attachment[]
 
   @@map("transactions")
 }
@@ -207,4 +214,112 @@ enum InsightPriority {
   low
   medium
   high
+}
+
+// New app models for WhatsApp assistant parity
+
+model Attachment {
+  id            String         @id @default(cuid())
+  transactionId String         @map("transaction_id")
+  kind          AttachmentKind
+  url           String
+  providerId    String?
+  createdAt     DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  transaction   Transaction    @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+
+  @@map("attachments")
+}
+
+enum AttachmentKind {
+  IMAGE
+  AUDIO
+  PDF
+}
+
+model Reminder {
+  id        String          @id @default(cuid())
+  userId    String          @map("user_id")
+  text      String
+  when      DateTime        @db.Timestamptz(6)
+  status    ReminderStatus  @default(PENDING)
+  createdAt DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([when, status])
+  @@map("reminders")
+}
+
+enum ReminderStatus {
+  PENDING
+  SENT
+  CANCELED
+}
+
+model MessageLog {
+  id         String            @id @default(cuid())
+  userId     String?           @map("user_id")
+  providerId String?           @unique @map("provider_id")
+  direction  MessageDirection
+  type       MessageType
+  content    String?
+  createdAt  DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user       User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("message_logs")
+}
+
+enum MessageDirection {
+  INBOUND
+  OUTBOUND
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  AUDIO
+  DOCUMENT
+}
+
+model Task {
+  id        String       @id @default(cuid())
+  userId    String       @map("user_id")
+  text      String
+  dueAt     DateTime?    @map("due_at") @db.Timestamptz(6)
+  priority  TaskPriority @default(medium)
+  status    TaskStatus   @default(open)
+  createdAt DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status, dueAt])
+  @@map("tasks")
+}
+
+enum TaskPriority {
+  low
+  medium
+  high
+}
+
+enum TaskStatus {
+  open
+  done
+  canceled
+}
+
+model Event {
+  id        String    @id @default(cuid())
+  userId    String    @map("user_id")
+  title     String
+  startAt   DateTime  @map("start_at") @db.Timestamptz(6)
+  endAt     DateTime? @map("end_at") @db.Timestamptz(6)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([startAt])
+  @@map("events")
 }
