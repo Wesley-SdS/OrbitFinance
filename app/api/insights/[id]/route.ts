@@ -6,9 +6,10 @@ import { userTag } from "@/lib/cache-tags"
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  props: { params: Promise<{ id: string }> }
 ) {
   try {
+    const params = await props.params
     const { id } = params
     const session = await auth.api.getSession({ headers: request.headers })
     if (!session?.user) return new NextResponse("Unauthorized", { status: 401 })
@@ -27,9 +28,10 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  props: { params: Promise<{ id: string }> }
 ) {
   try {
+    const params = await props.params
     const { id } = params
     const session = await auth.api.getSession({ headers: request.headers })
     if (!session?.user) return new NextResponse("Unauthorized", { status: 401 })
