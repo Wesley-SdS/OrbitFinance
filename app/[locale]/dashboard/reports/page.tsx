@@ -7,15 +7,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ExportReportForm } from "@/components/export-report-form"
 import { decimalToNumber } from "@/lib/utils"
 import { redirect } from "@/lib/navigation"
+import { getLocale } from "next-intl/server"
 
 export default async function ReportsPage() {
   const session = await getSession()
 
   if (!session?.user) {
-    redirect("/auth/login")
+    const locale = await getLocale()
+    redirect({ href: "/auth/login", locale })
   }
 
-  const transactions = await getTransactionsCached(session.user.id)
+  const userId = session!.user.id
+  const transactions = await getTransactionsCached(userId)
   const txs = transactions.map((t) => ({
     ...t,
     amount: decimalToNumber(t.amount),

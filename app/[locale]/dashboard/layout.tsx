@@ -3,12 +3,14 @@ import { getSession } from "@/lib/session"
 import { redirect } from "@/lib/navigation"
 import { DashboardNav } from "@/components/dashboard-nav"
 import { Sidebar, SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
+import { getLocale } from "next-intl/server"
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession()
 
   if (!session) {
-    redirect("/auth/login")
+    const locale = await getLocale()
+    redirect({ href: "/auth/login", locale })
   }
 
   return (

@@ -1,15 +1,17 @@
 import { getSession } from "@/lib/session"
 import { TransactionEditLoader } from "@/components/transaction-edit-loader"
 import { redirect } from "@/lib/navigation"
-import { getTranslations } from "next-intl/server"
+import { getTranslations, getLocale } from "next-intl/server"
 
-export default async function EditTransactionPage({ params }: { params: { id: string } }) {
+export default async function EditTransactionPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params
   const { id } = params
 
   const session = await getSession()
 
   if (!session?.user) {
-    redirect("/auth/login")
+    const locale = await getLocale()
+    redirect({ href: "/auth/login", locale })
   }
 
   return (

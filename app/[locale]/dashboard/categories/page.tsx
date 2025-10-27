@@ -1,21 +1,24 @@
 import { getSession } from "@/lib/session"
-import { CategoriesList } from "@/components/categories-list"
-import { getCategoriesCached } from "@/lib/cached"
+import { CategoriesListClient } from "@/components/categories-list-client"
+import { getCategories } from "@/lib/queries"
 import { Button } from "@/components/ui/button"
 import { Link } from "@/lib/navigation"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { redirect } from "@/lib/navigation"
-import { getTranslations } from "next-intl/server"
+import { getTranslations, getLocale } from "next-intl/server"
 
 export default async function CategoriesPage() {
   const session = await getSession()
 
   if (!session?.user) {
-    redirect("/auth/login")
+    const locale = await getLocale()
+    redirect({ href: "/auth/login", locale })
   }
 
-  const expenseCategories = await getCategoriesCached(session.user.id, "expense")
-  const incomeCategories = await getCategoriesCached(session.user.id, "income")
+  const userId = session!.user.id
+  const allCategories = await getCategories(userId)
+  const expenseCategories = allCategories.filter(cat => cat.type === "expense")
+  const incomeCategories = allCategories.filter(cat => cat.type === "income")
 
   const t = await getTranslations()
   return (
@@ -48,10 +51,10 @@ export default async function CategoriesPage() {
           <TabsTrigger value="income">{t("transactions.income")}</TabsTrigger>
         </TabsList>
         <TabsContent value="expense" className="mt-6">
-          <CategoriesList categories={expenseCategories as any} type="expense" />
+          <CategoriesListClient initialCategories={expenseCategories} />
         </TabsContent>
         <TabsContent value="income" className="mt-6">
-          <CategoriesList categories={incomeCategories as any} type="income" />
+          <CategoriesListClient initialCategories={incomeCategories} />
         </TabsContent>
       </Tabs>
     </div>

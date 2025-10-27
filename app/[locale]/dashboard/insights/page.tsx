@@ -5,18 +5,19 @@ import { GenerateInsightsButton } from "@/components/generate-insights-button"
 import { Button } from "@/components/ui/button"
 import { Link } from "@/lib/navigation"
 import { redirect } from "@/lib/navigation"
-import { getTranslations } from "next-intl/server"
+import { getTranslations, getLocale } from "next-intl/server"
 
 export default async function InsightsPage() {
   const session = await getSession()
 
   if (!session?.user) {
-    redirect("/auth/login")
+    const locale = await getLocale()
+    redirect({ href: "/auth/login", locale })
   }
 
-
+  const userId = session!.user.id
   const t = await getTranslations()
-  const insights = await getInsightsCached(session.user.id)
+  const insights = await getInsightsCached(userId)
   return (
     <div className="container max-w-6xl py-8">
       <div className="mb-8 flex items-center justify-between">

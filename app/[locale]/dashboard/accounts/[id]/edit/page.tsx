@@ -2,12 +2,12 @@ import type { Metadata } from "next"
 import { getSession } from "@/lib/session"
 import { redirect } from "@/lib/navigation"
 import { AccountEditLoader } from "@/components/account-edit-loader"
-import { getTranslations } from "next-intl/server"
+import { getTranslations, getLocale } from "next-intl/server"
 
 interface EditAccountPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -15,11 +15,13 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("accounts.edit") }
 }
 
-export default async function EditAccountPage({ params }: EditAccountPageProps) {
+export default async function EditAccountPage(props: EditAccountPageProps) {
+  const params = await props.params
   const { id } = params
   const session = await getSession()
   if (!session?.user) {
-    redirect("/auth/login")
+    const locale = await getLocale()
+    redirect({ href: "/auth/login", locale })
   }
 
   return (
