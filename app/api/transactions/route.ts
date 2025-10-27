@@ -15,9 +15,30 @@ export async function GET(request: NextRequest) {
       where: {
         userId: session.user.id
       },
-      include: {
-        financialAccount: true,
-        category: true,
+      select: {
+        id: true,
+        amount: true,
+        description: true,
+        notes: true,
+        type: true,
+        date: true,
+        categoryId: true,
+        financialAccountId: true,
+        financialAccount: {
+          select: {
+            id: true,
+            name: true,
+            type: true,
+          },
+        },
+        category: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+            type: true,
+          },
+        },
       },
       orderBy: {
         date: "desc"
@@ -53,9 +74,30 @@ export async function POST(request: NextRequest) {
           categoryId,
           date: new Date(date),
         },
-        include: {
-          financialAccount: true,
-          category: true,
+        select: {
+          id: true,
+          amount: true,
+          description: true,
+          notes: true,
+          type: true,
+          date: true,
+          categoryId: true,
+          financialAccountId: true,
+          financialAccount: {
+            select: {
+              id: true,
+              name: true,
+              type: true,
+            },
+          },
+          category: {
+            select: {
+              id: true,
+              name: true,
+              color: true,
+              type: true,
+            },
+          },
         },
       })
 
