@@ -1,54 +1,23 @@
-"use client"
-
 import type React from "react"
-import { useState, useEffect } from "react"
-import { useSession } from "@/lib/auth-client"
-import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Link } from "@/lib/navigation"
 import { Badge } from "@/components/ui/badge"
 import { formatCurrency, decimalToNumber, calculatePercentage } from "@/lib/utils"
-import type { Goal } from "@prisma/client"
+import type { Goal } from "@/lib/types"
 import { useTranslations } from "next-intl"
 
-export function GoalsList({ goals: initialGoals }: { goals?: Goal[] }) {
-  const [goals, setGoals] = useState<Goal[]>(initialGoals || [])
-  const [isLoading, setIsLoading] = useState(!initialGoals)
-  const { data: session } = useSession()
+interface GoalsListProps {
+  goals: Goal[]
+  onDelete?: (id: string) => Promise<void>
+}
+
+export function GoalsList({ goals, onDelete }: GoalsListProps) {
   const t = useTranslations()
 
-  useEffect(() => {
-    if (session && !initialGoals) {
-      fetchGoals()
-    }
-  }, [session, initialGoals])
-
-  const fetchGoals = async () => {
-    try {
-      const res = await fetch("/api/goals", { cache: "no-store" })
-      if (!res.ok) throw new Error("Failed to load goals")
-      const data = await res.json()
-      setGoals(data.goals as Goal[])
-    } catch (error) {
-      console.error("Failed to fetch goals:", error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
   const handleDelete = async (id: string) => {
-    try {
-      const res = await fetch(`/api/goals/${id}`, { method: "DELETE" })
-      if (!res.ok) throw new Error("Failed to delete goal")
-      fetchGoals()
-    } catch (error) {
-      console.error("Failed to delete goal:", error)
-      toast?.error?.("Failed to delete goal")
+    if (onDelete) {
+      await onDelete(id)
     }
-  }
-
-  if (isLoading) {
-    return <div className="p-4 text-center">{t("common.loading")}</div>
   }
 
   if (goals.length === 0) {
@@ -64,13 +33,18 @@ export function GoalsList({ goals: initialGoals }: { goals?: Goal[] }) {
     <div className="space-y-4">
       {goals.map((goal) => {
         const progress = calculatePercentage(goal.currentAmount, goal.targetAmount)
-        const isOverdue = goal.deadline && new Date(goal.deadline) < new Date() && !goal.isCompleted
+        const isOverdue = goal.deadline && new Date(goal.deadline) < new Date()
 
         return (
           <div key={goal.id} className="space-y-3 rounded-lg border p-4">
             <div className="flex items-start justify-between">
               <div>
                 <h3 className="font-medium">{goal.name}</h3>
+                {goal.category && (
+                  <Badge variant="outline">
+                    {goal.category}
+                  </Badge>
+                )}
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" asChild>
@@ -78,9 +52,11 @@ export function GoalsList({ goals: initialGoals }: { goals?: Goal[] }) {
                     {t("common.edit")}
                   </Link>
                 </Button>
-                <Button variant="destructive" size="sm" onClick={() => handleDelete(goal.id)}>
-                  {t("common.delete")}
-                </Button>
+                {onDelete && (
+                  <Button variant="destructive" size="sm" onClick={() => handleDelete(goal.id)}>
+                    {t("common.delete")}
+                  </Button>
+                )}
               </div>
             </div>
 
@@ -92,7 +68,7 @@ export function GoalsList({ goals: initialGoals }: { goals?: Goal[] }) {
               <div className="h-2 w-full rounded-full bg-gray-200">
                 <div
                   className={`h-2 rounded-full ${
-                    goal.isCompleted ? "bg-green-600" : isOverdue ? "bg-red-600" : "bg-blue-600"
+                    progress >= 100 ? "bg-green-600" : isOverdue ? "bg-red-600" : "bg-blue-600"
                   }`}
                   style={{ width: `${Math.min(progress, 100)}%` }}
                 />
@@ -111,7 +87,7 @@ export function GoalsList({ goals: initialGoals }: { goals?: Goal[] }) {
               )}
             </div>
 
-            {goal.isCompleted && <Badge className="bg-green-100 text-green-800">{t("goals.completed")}</Badge>}
+            {progress >= 100 && <Badge className="bg-green-100 text-green-800">{t("goals.completed")}</Badge>}
           </div>
         )
       })}

@@ -1,22 +1,23 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useSession } from "@/lib/auth-client"
 import { Button } from "@/components/ui/button"
-import { Link } from "@/lib/navigation"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
-import { formatCurrency } from "@/lib/utils"
-import type { Category } from "@prisma/client"
 import { useTranslations } from "next-intl"
+import type { Category } from "@/lib/types"
 
-export function CategoryForm({ category, onSuccess }: { category?: Category; onSuccess?: () => void }) {
+interface CategoryFormProps {
+  category?: Category
+  onSuccess?: () => void
+}
+
+export function CategoryForm({ category, onSuccess }: CategoryFormProps) {
   const [name, setName] = useState(category?.name || "")
-  const [type, setType] = useState<"income" | "expense">(category?.type || "expense")
+  const [type, setType] = useState<"income" | "expense" | "both">(category?.type || "expense")
   const [color, setColor] = useState(category?.color || "#6b7280")
-  const [icon, setIcon] = useState(category?.icon || "📝")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const { data: session } = useSession()
@@ -34,26 +35,19 @@ export function CategoryForm({ category, onSuccess }: { category?: Category; onS
         name,
         type,
         color,
-        icon,
         userId: session.user.id,
       }
 
-      if (category?.id) {
-        const res = await fetch(`/api/categories/${category.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(categoryData),
-        })
-        if (!res.ok) throw new Error(t("common.error"))
-      } else {
-        const res = await fetch(`/api/categories`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(categoryData),
-        })
-        if (!res.ok) throw new Error(t("common.error"))
-      }
+      const url = category?.id ? `/api/categories/${category.id}` : "/api/categories"
+      const method = category?.id ? "PUT" : "POST"
 
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(categoryData),
+      })
+      
+      if (!res.ok) throw new Error(t("common.error"))
       onSuccess?.()
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : t("common.error"))
@@ -80,6 +74,7 @@ export function CategoryForm({ category, onSuccess }: { category?: Category; onS
         >
           <option value="income">{t("transactions.income")}</option>
           <option value="expense">{t("transactions.expense")}</option>
+          <option value="both">{t("categories.both")}</option>
         </select>
       </div>
 
@@ -94,11 +89,6 @@ export function CategoryForm({ category, onSuccess }: { category?: Category; onS
         />
       </div>
 
-      <div className="grid gap-2">
-        <Label htmlFor="icon">{t("categories.icon")}</Label>
-        <Input id="icon" value={icon} onChange={(e) => setIcon(e.target.value)} placeholder="📝" maxLength={2} />
-      </div>
-
       {error && <div className="bg-destructive/10 text-destructive rounded-lg p-3 text-sm">{error}</div>}
 
       <Button type="submit" className="w-full" disabled={isLoading}>
@@ -108,51 +98,21 @@ export function CategoryForm({ category, onSuccess }: { category?: Category; onS
   )
 }
 
-export function CategoriesList({
-  categories: initialCategories,
-  type: filterType,
-}: {
-  categories?: Category[]
-  type?: string
-}) {
-  const [categories, setCategories] = useState<Category[]>(initialCategories || [])
-  const [isLoading, setIsLoading] = useState(!initialCategories)
-  const { data: session } = useSession()
+import { Link } from "@/lib/navigation"
+import { Badge } from "@/components/ui/badge"
+
+interface CategoriesListProps {
+  categories: Category[]
+  onDelete?: (id: string) => Promise<void>
+}
+
+export function CategoriesList({ categories, onDelete }: CategoriesListProps) {
   const t = useTranslations()
 
-  useEffect(() => {
-    if (session && !initialCategories) {
-      fetchCategories()
-    }
-  }, [session, initialCategories])
-
-  const fetchCategories = async () => {
-    try {
-      const url = new URL(`/api/categories`, window.location.origin)
-      if (filterType) url.searchParams.set("type", filterType)
-      const res = await fetch(url.toString(), { cache: "no-store" })
-      if (!res.ok) throw new Error("Failed to load categories")
-      const data = await res.json()
-      setCategories(data.categories as Category[])
-    } catch (error) {
-      console.error("Failed to fetch categories:", error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
   const handleDelete = async (id: string) => {
-    try {
-      const res = await fetch(`/api/categories/${id}`, { method: "DELETE" })
-      if (!res.ok) throw new Error("Failed to delete category")
-      fetchCategories()
-    } catch (error) {
-      console.error("Failed to delete category:", error)
+    if (onDelete) {
+      await onDelete(id)
     }
-  }
-
-  if (isLoading) {
-    return <div className="p-4 text-center">{t("common.loading")}</div>
   }
 
   if (categories.length === 0) {
@@ -171,15 +131,15 @@ export function CategoriesList({
           <div className="flex items-center gap-3">
             <div
               className="flex h-10 w-10 items-center justify-center rounded-full text-lg"
-              style={{ backgroundColor: category.color + "20", color: category.color }}
+              style={{ backgroundColor: (category.color || "#000") + "20", color: category.color || "#000" }}
             >
-              {category.icon}
+              {(category._count?.transactions ?? 0) > 0 ? `${category._count?.transactions ?? 0}` : "📝"}
             </div>
             <div>
               <p className="font-medium">{category.name}</p>
-              <Badge variant={category.type === "income" ? "default" : "secondary"}>{
-                category.type === "income" ? t("transactions.income") : t("transactions.expense")
-              }</Badge>
+              <Badge variant={category.type === "income" ? "default" : category.type === "expense" ? "secondary" : "outline"}>
+                {category.type === "income" ? t("transactions.income") : category.type === "expense" ? t("transactions.expense") : t("categories.both")}
+              </Badge>
             </div>
           </div>
           <div className="flex gap-2">
@@ -188,9 +148,11 @@ export function CategoriesList({
                 {t("common.edit")}
               </Link>
             </Button>
-            <Button variant="destructive" size="sm" onClick={() => handleDelete(category.id)}>
-              {t("common.delete")}
-            </Button>
+            {onDelete && (
+              <Button variant="destructive" size="sm" onClick={() => handleDelete(category.id)}>
+                {t("common.delete")}
+              </Button>
+            )}
           </div>
         </div>
       ))}

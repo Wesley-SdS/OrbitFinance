@@ -7,14 +7,13 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { formatCurrency } from "@/lib/utils"
-import type { FinancialAccount, Category } from "@prisma/client"
+import type { CategoryBasic, AccountBasic } from "@/lib/types"
 import { useTranslations } from "next-intl"
 
 interface TransactionFormProps {
   transaction?: any
-  accounts?: FinancialAccount[]
-  categories?: Category[]
+  accounts?: AccountBasic[]
+  categories?: CategoryBasic[]
   onSuccess?: () => void
 }
 
@@ -35,8 +34,8 @@ export function TransactionForm({
   )
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [accounts, setAccounts] = useState<FinancialAccount[]>(initialAccounts || [])
-  const [categories, setCategories] = useState<Category[]>(initialCategories || [])
+  const [accounts, setAccounts] = useState<AccountBasic[]>(initialAccounts || [])
+  const [categories, setCategories] = useState<CategoryBasic[]>(initialCategories || [])
   const t = useTranslations()
 
   useEffect(() => {
@@ -154,7 +153,7 @@ export function TransactionForm({
             <SelectContent>
               {accounts.map((account) => (
                 <SelectItem key={account.id} value={account.id}>
-                  {account.icon} {account.name}
+                  {account.icon || ""} {account.name}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -170,7 +169,7 @@ export function TransactionForm({
             <SelectContent>
               {categories.map((category) => (
                 <SelectItem key={category.id} value={category.id}>
-                  {category.icon} {category.name}
+                  {category.icon || ""} {category.name}
                 </SelectItem>
               ))}
             </SelectContent>

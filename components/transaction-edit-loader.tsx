@@ -2,17 +2,12 @@
 
 import { useEffect, useState } from "react"
 import { TransactionForm } from "@/components/transaction-form"
-import type { Transaction, FinancialAccount, Category } from "@prisma/client"
-
-type TransactionWithRelations = Transaction & {
-  category: Category
-  financialAccount: FinancialAccount
-}
+import type { CategoryBasic, AccountBasic } from "@/lib/types"
 
 export function TransactionEditLoader({ id }: { id: string }) {
-  const [transaction, setTransaction] = useState<TransactionWithRelations | null>(null)
-  const [accounts, setAccounts] = useState<FinancialAccount[] | null>(null)
-  const [categories, setCategories] = useState<Category[] | null>(null)
+  const [transaction, setTransaction] = useState<any | null>(null)
+  const [accounts, setAccounts] = useState<AccountBasic[] | null>(null)
+  const [categories, setCategories] = useState<CategoryBasic[] | null>(null)
 
   useEffect(() => {
     const load = async () => {
@@ -27,9 +22,9 @@ export function TransactionEditLoader({ id }: { id: string }) {
           accRes.ok ? accRes.json() : { accounts: [] },
           catRes.ok ? catRes.json() : { categories: [] },
         ])
-        setTransaction(txJson.transaction as TransactionWithRelations)
-        setAccounts(accJson.accounts as FinancialAccount[])
-        setCategories((catJson.categories as Category[]) || [])
+        setTransaction(txJson.transaction as any)
+        setAccounts(accJson.accounts as AccountBasic[])
+        setCategories((catJson.categories as CategoryBasic[]) || [])
       } catch {
         setTransaction(null)
         setAccounts([])

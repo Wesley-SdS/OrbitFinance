@@ -64,14 +64,16 @@ export function AccountsList({ accounts: initialAccounts }: AccountsListProps) {
 
   const getAccountTypeColor = (type: string) => {
     switch (type) {
-      case "CHECKING":
+      case "checking":
         return "bg-blue-100 text-blue-800"
-      case "SAVINGS":
+      case "savings":
         return "bg-green-100 text-green-800"
-      case "CREDIT_CARD":
+      case "credit_card":
         return "bg-red-100 text-red-800"
-      case "INVESTMENT":
+      case "investment":
         return "bg-purple-100 text-purple-800"
+      case "cash":
+        return "bg-yellow-100 text-yellow-800"
       default:
         return "bg-gray-100 text-gray-800"
     }
@@ -97,13 +99,13 @@ export function AccountsList({ accounts: initialAccounts }: AccountsListProps) {
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{account.name}</CardTitle>
             <Badge className={getAccountTypeColor(account.type)}>{
-              account.type === "CHECKING"
+              account.type === "checking"
                 ? t("accounts.types.checking")
-                : account.type === "SAVINGS"
+                : account.type === "savings"
                 ? t("accounts.types.savings")
-                : account.type === "CREDIT_CARD"
+                : account.type === "credit_card"
                 ? t("accounts.types.credit")
-                : account.type === "INVESTMENT"
+                : account.type === "investment"
                 ? t("accounts.types.investment")
                 : t("accounts.types.cash")
             }</Badge>
