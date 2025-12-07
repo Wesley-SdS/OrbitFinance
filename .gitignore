@@ -27,7 +27,6 @@ yarn-error.log*
 next-env.d.ts
 
 # local tools
-NUL
 .claude/settings.local.json
 
 # test coverage
