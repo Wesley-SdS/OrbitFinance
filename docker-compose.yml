@@ -26,6 +26,72 @@ services:
     networks:
       - orbifinance-network
 
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: orbifinance-postgres
+    environment:
+      POSTGRES_DB: orbifinance_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts:/docker-entrypoint-initdb.d
+    networks:
+      - orbifinance-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: orbifinance-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - orbifinance-network
+
+  twilio-whatsapp:
+    image: node:20-alpine
+    container_name: orbifinance-twilio-whatsapp
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=development
+      - PORT=8080
+      - TWILIO_ACCOUNT_SID=
+      - TWILIO_AUTH_TOKEN=
+      - TWILIO_PHONE_NUMBER=
+      - WEBHOOK_URL=http://localhost:3000/api/whatsapp/webhook
+    volumes:
+      - ./twilio-whatsapp-service:/app
+    working_dir: /app
+    command: sh -c "npm install && npm start"
+    networks:
+      - orbifinance-network
+    restart: unless-stopped
+
+  meta-whatsapp:
+    image: node:20-alpine
+    container_name: orbifinance-meta-whatsapp
+    ports:
+      - "8081:8080"
+    environment:
+      - NODE_ENV=development
+      - PORT=8081
+      - META_WHATSAPP_PHONE_NUMBER_ID=
+      - META_WHATSAPP_ACCESS_TOKEN=
+      - META_WHATSAPP_WEBHOOK_VERIFY_TOKEN=orbifinance-webhook-verify-2025
+      - WEBHOOK_URL=http://localhost:3000/api/whatsapp/webhook
+    volumes:
+      - ./meta-whatsapp-service:/app
+    working_dir: /app
+    command: sh -c "npm install && npm start"
+    networks:
+      - orbifinance-network
+    restart: unless-stopped
+
 volumes:
   postgres_data:
   redis_data:

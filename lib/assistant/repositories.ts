@@ -2,6 +2,7 @@ import { Prisma, PrismaClient, AccountType, CategoryType, TransactionType, Remin
 import { prisma } from '../prisma'
 
 export interface UserRepo {
+  getByPhone(phone: string): Promise<{ id: string; phone: string } | null>
   getOrCreateByPhone(phone: string): Promise<{ id: string; phone: string }>
 }
 
@@ -47,13 +48,43 @@ export interface AttachmentRepo {
 
 export class PrismaUserRepo implements UserRepo {
   constructor(private readonly db: PrismaClient = prisma) {}
-  async getOrCreateByPhone(phone: string) {
-    const normalized = phone
-    const found = await this.db.user.findFirst({ where: { phone: normalized } })
+  
+  async getByPhone(phone: string) {
+    const normalized = phone.replace(/\D/g, '')
+    const found = await this.db.user.findFirst({ 
+      where: { whatsappPhone: normalized } 
+    })
     if (found) return { id: found.id, phone: normalized }
-    // create minimal user with synthetic email
+    return null
+  }
+
+  async getOrCreateByPhone(phone: string) {
+    const normalized = phone.replace(/\D/g, '')
+
+    // First try to find by whatsappPhone (preferred)
+    const linkedUser = await this.getByPhone(phone)
+    if (linkedUser) return linkedUser
+
+    // Legacy: check old 'phone' field and migrate to whatsappPhone
+    const found = await this.db.user.findFirst({ where: { phone: normalized } })
+    if (found) {
+      // Migrate: update to use whatsappPhone
+      await this.db.user.update({
+        where: { id: found.id },
+        data: { whatsappPhone: normalized }
+      })
+      return { id: found.id, phone: normalized }
+    }
+
+    // Create new user with whatsappPhone (not phone)
     const email = `wa-${normalized}@local.invalid`
-    const created = await this.db.user.create({ data: { email, phone: normalized, emailVerified: false } })
+    const created = await this.db.user.create({
+      data: {
+        email,
+        whatsappPhone: normalized, // Use whatsappPhone instead of phone
+        emailVerified: false
+      }
+    })
     return { id: created.id, phone: normalized }
   }
 }
@@ -94,18 +125,39 @@ export class PrismaTransactionRepo implements TransactionRepo {
     const account = await this.getDefaultAccount(input.userId)
     const catType: CategoryType = input.type === 'INCOME' ? 'income' : 'expense'
     const category = await this.getCategory(input.userId, input.categoryName ?? null, catType)
-    const tx = await this.db.transaction.create({
-      data: {
-        userId: input.userId,
-        financialAccountId: account.id,
-        categoryId: category.id,
-        type: input.type === 'INCOME' ? TransactionType.income : TransactionType.expense,
-        amount: new Prisma.Decimal(input.amount),
-        description: input.description ?? null,
-        date: new Date(input.occurredAt.getFullYear(), input.occurredAt.getMonth(), input.occurredAt.getDate()),
-      },
+
+    // Use transaction to ensure atomicity (create transaction + update balance)
+    const result = await this.db.$transaction(async (tx) => {
+      // Create transaction
+      const transaction = await tx.transaction.create({
+        data: {
+          userId: input.userId,
+          financialAccountId: account.id,
+          categoryId: category.id,
+          type: input.type === 'INCOME' ? TransactionType.income : TransactionType.expense,
+          amount: new Prisma.Decimal(input.amount),
+          description: input.description ?? null,
+          date: new Date(input.occurredAt.getFullYear(), input.occurredAt.getMonth(), input.occurredAt.getDate()),
+        },
+      })
+
+      // Update account balance
+      if (input.type === 'INCOME') {
+        await tx.financialAccount.update({
+          where: { id: account.id },
+          data: { balance: { increment: input.amount } },
+        })
+      } else if (input.type === 'EXPENSE') {
+        await tx.financialAccount.update({
+          where: { id: account.id },
+          data: { balance: { decrement: input.amount } },
+        })
+      }
+
+      return { id: transaction.id, categoryId: transaction.categoryId }
     })
-    return { id: tx.id, categoryId: tx.categoryId }
+
+    return result
   }
 
   async listByPeriod(userId: string, from: Date, to: Date): Promise<Array<{ amount: number; type: 'INCOME' | 'EXPENSE'; category: string | null }>> {

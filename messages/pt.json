@@ -40,6 +40,8 @@
     "fullName": "Nome Completo",
     "fullNamePlaceholder": "João Silva",
     "emailPlaceholder": "nome@exemplo.com",
+    "whatsapp": "WhatsApp",
+    "whatsappPlaceholder": "5511999999999",
     "signingIn": "Entrando...",
     "createAccount": "Criar conta",
     "creatingAccount": "Criando conta...",
@@ -50,7 +52,8 @@
     "noAccount": "Não tem uma conta?",
     "hasAccount": "Já tem uma conta?",
     "checkEmail": "Verifique seu e-mail",
-    "emailSent": "Enviamos um e-mail de confirmação. Por favor, verifique sua caixa de entrada e clique no link para verificar sua conta."
+    "emailSent": "Enviamos um e-mail de confirmação. Por favor, verifique sua caixa de entrada e clique no link para verificar sua conta.",
+    "orContinueWith": "Ou continue com"
   },
   "dashboard": {
     "title": "Painel",

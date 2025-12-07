@@ -36,6 +36,8 @@
     "welcomeBack": "Welcome back",
     "enterCredentials": "Enter your credentials to access your account",
     "createAccountTitle": "Create an account",
+    "whatsapp": "WhatsApp",
+    "whatsappPlaceholder": "5511999999999",
     "createAccountSubtitle": "Start managing your finances with AI insights",
     "fullName": "Full Name",
     "fullNamePlaceholder": "John Doe",
@@ -50,7 +52,8 @@
     "noAccount": "Don't have an account?",
     "hasAccount": "Already have an account?",
     "checkEmail": "Check your email",
-    "emailSent": "We've sent you a confirmation email. Please check your inbox and click the link to verify your account."
+    "emailSent": "We've sent you a confirmation email. Please check your inbox and click the link to verify your account.",
+    "orContinueWith": "Or continue with"
   },
   "dashboard": {
     "title": "Dashboard",

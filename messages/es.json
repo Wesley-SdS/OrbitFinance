@@ -36,6 +36,8 @@
     "welcomeBack": "Bienvenido de nuevo",
     "enterCredentials": "Ingresa tus credenciales para acceder a tu cuenta",
     "createAccountTitle": "Crear una cuenta",
+    "whatsapp": "WhatsApp",
+    "whatsappPlaceholder": "5511999999999",
     "createAccountSubtitle": "Comienza a gestionar tus finanzas con insights de IA",
     "fullName": "Nombre Completo",
     "fullNamePlaceholder": "Juan Pérez",
@@ -50,7 +52,8 @@
     "noAccount": "¿No tienes una cuenta?",
     "hasAccount": "¿Ya tienes una cuenta?",
     "checkEmail": "Revisa tu correo",
-    "emailSent": "Te hemos enviado un correo de confirmación. Por favor, revisa tu bandeja de entrada y haz clic en el enlace para verificar tu cuenta."
+    "emailSent": "Te hemos enviado un correo de confirmación. Por favor, revisa tu bandeja de entrada y haz clic en el enlace para verificar tu cuenta.",
+    "orContinueWith": "O continúa con"
   },
   "dashboard": {
     "title": "Panel",

@@ -3,7 +3,10 @@ import type { Transaction, Category, FinancialAccount, Goal, Insight } from '@/l
 
 export async function getTransactions(userId: string): Promise<Transaction[]> {
   const transactions = await prisma.transaction.findMany({
-    where: { userId },
+    where: {
+      userId,
+      deletedAt: null,
+    },
     select: {
       id: true,
       type: true,
@@ -52,7 +55,9 @@ export async function getCategories(userId: string): Promise<Category[]> {
       type: true,
       _count: {
         select: {
-          transactions: true,
+          transactions: {
+            where: { deletedAt: null },
+          },
         },
       },
     },
@@ -96,7 +101,9 @@ export async function getFinancialAccounts(userId: string): Promise<FinancialAcc
       isActive: true,
       _count: {
         select: {
-          transactions: true,
+          transactions: {
+            where: { deletedAt: null },
+          },
         },
       },
     },
@@ -125,7 +132,10 @@ export async function getFinancialAccountsBasic(userId: string) {
 
 export async function getGoals(userId: string): Promise<Goal[]> {
   const goals = await prisma.goal.findMany({
-    where: { userId },
+    where: {
+      userId,
+      deletedAt: null,
+    },
     orderBy: { deadline: 'asc' },
   })
 

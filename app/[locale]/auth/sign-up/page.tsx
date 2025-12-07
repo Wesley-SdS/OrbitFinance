@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { AuthInteractiveBackground } from "@/components/auth-interactive-background"
 import { AuthLayout } from "@/components/auth-layout"
+import { SocialLogin } from "@/components/auth/social-login"
 import { Link, useRouter } from "@/lib/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
@@ -16,6 +17,7 @@ import { useTranslations } from "next-intl"
 export default function SignUpPage() {
   const [fullName, setFullName] = useState("")
   const [email, setEmail] = useState("")
+  const [whatsapp, setWhatsapp] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
@@ -40,6 +42,12 @@ export default function SignUpPage() {
       return
     }
 
+    if (whatsapp && whatsapp.replace(/\D/g, '').length < 10) {
+      toast.error("WhatsApp deve ter pelo menos 10 dígitos")
+      setIsLoading(false)
+      return
+    }
+
     try {
       const result = await signUp.email({
         email,
@@ -59,6 +67,45 @@ export default function SignUpPage() {
           toast.error(result.error.message || "Erro ao criar conta")
         }
         return
+      }
+
+      if (whatsapp) {
+        try {
+          const baseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin
+          const response = await fetch(`${baseUrl}/api/user/whatsapp`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ phone: whatsapp })
+          })
+
+          if (!response.ok) {
+            const error = await response.json()
+            console.error("WhatsApp link failed:", error)
+            toast.error("WhatsApp não vinculado", {
+              description: error.error || "Não foi possível vincular seu WhatsApp. Você pode configurar depois.",
+            })
+          } else {
+            toast.success("WhatsApp vinculado!", {
+              description: "Agora você pode enviar mensagens para registrar transações.",
+            })
+          }
+        } catch (whatsappError) {
+          console.error("WhatsApp link error:", whatsappError)
+          toast.error("Erro ao vincular WhatsApp", {
+            description: "Você pode configurar o WhatsApp depois no dashboard.",
+          })
+        }
+      }
+
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin
+        await fetch(`${baseUrl}/api/users/setup`, {
+          method: "POST",
+          credentials: "include",
+        })
+      } catch (setupError) {
+        console.error("Setup error:", setupError)
       }
 
       toast.success("Conta criada com sucesso!")
@@ -100,6 +147,16 @@ export default function SignUpPage() {
               />
             </div>
             <div className="grid gap-2">
+              <Label htmlFor="whatsapp">{t("auth.whatsapp") || "WhatsApp"}</Label>
+              <Input
+                id="whatsapp"
+                type="tel"
+                placeholder="(11) 96092-4734"
+                value={whatsapp}
+                onChange={(e) => setWhatsapp(e.target.value)}
+              />
+            </div>
+            <div className="grid gap-2">
               <Label htmlFor="password">{t("auth.password")}</Label>
               <Input
                 id="password"
@@ -124,6 +181,20 @@ export default function SignUpPage() {
               {isLoading ? t("auth.creatingAccount") : t("auth.createAccount")}
             </Button>
           </div>
+
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">
+                {t("auth.orContinueWith")}
+              </span>
+            </div>
+          </div>
+
+          <SocialLogin />
+
           <div className="mt-4 text-center text-sm">
             {t("auth.hasAccount") + " "}
             <Link href="/auth/login" className="hover:text-primary underline underline-offset-4">

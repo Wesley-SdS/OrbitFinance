@@ -15,6 +15,7 @@ model User {
   name          String?
   image         String?
   phone         String?        @unique
+  whatsappPhone String?        @unique @map("whatsapp_phone")
   createdAt     DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt     DateTime       @updatedAt @map("updated_at") @db.Timestamptz(6)
 
@@ -136,14 +137,16 @@ model Transaction {
   description       String?
   date              DateTime          @default(now()) @db.Date
   notes             String?
+  deletedAt         DateTime?         @map("deleted_at") @db.Timestamptz(6)
   createdAt         DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt         DateTime          @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  financialAccount FinancialAccount @relation(fields: [financialAccountId], references: [id], onDelete: Cascade)
-  category         Category         @relation(fields: [categoryId], references: [id])
+  financialAccount FinancialAccount @relation(fields: [financialAccountId], references: [id], onDelete: Restrict)
+  category         Category         @relation(fields: [categoryId], references: [id], onDelete: Restrict)
   attachments      Attachment[]
 
+  @@index([deletedAt])
   @@map("transactions")
 }
 
@@ -158,11 +161,13 @@ model Goal {
   color         String    @default("#10b981")
   icon          String    @default("target")
   isCompleted   Boolean   @default(false) @map("is_completed")
+  deletedAt     DateTime? @map("deleted_at") @db.Timestamptz(6)
   createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([deletedAt])
   @@map("goals")
 }
 
@@ -322,4 +327,21 @@ model Event {
 
   @@index([startAt])
   @@map("events")
+}
+
+model AuditLog {
+  id         String    @id @default(cuid())
+  userId     String    @map("user_id")
+  action     String
+  entity     String
+  entityId   String    @map("entity_id")
+  oldValues  Json?     @map("old_values")
+  newValues  Json?     @map("new_values")
+  ipAddress  String?   @map("ip_address")
+  userAgent  String?   @map("user_agent")
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([userId, createdAt])
+  @@index([entity, entityId])
+  @@map("audit_logs")
 }

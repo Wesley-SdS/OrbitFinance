@@ -14,3 +14,9 @@ export class Dispatcher {
   }
 }
 
+// Export helper function for reminder worker
+export async function sendWhatsAppMessage(to: string, text: string): Promise<void> {
+  const dispatcher = new Dispatcher()
+  await dispatcher.sendText(to, text)
+}
+

@@ -7,7 +7,8 @@ describe('NLU', () => {
     expect(parseIntent(text)).toEqual({ kind: 'LOG_EXPENSE' })
     expect(parseAmount(text)).toBe(28.5)
     expect(parseCategory(text)).toBe('alimentacao')
-    const d = parseDateRelative(text, new Date('2024-05-10'))
+    // Use Date constructor with year, month, day to avoid timezone issues
+    const d = parseDateRelative(text, new Date(2024, 4, 10)) // May 10, 2024
     expect(d?.getDate()).toBe(9)
   })
   it('detects income', () => {

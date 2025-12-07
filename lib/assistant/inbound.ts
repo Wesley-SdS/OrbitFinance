@@ -1,3 +1,4 @@
+import { NextRequest, NextResponse } from 'next/server'
 import { parseIntent, normalizePhone } from './nlu'
 import { LogTransaction } from './usecases/log-transaction'
 import { GenerateReport } from './usecases/generate-report'
@@ -8,9 +9,11 @@ import { PrismaMessageLogRepo, PrismaUserRepo, PrismaAttachmentRepo } from './re
 import { ReplyService } from './replies'
 import { Dispatcher } from './dispatcher'
 import type { WhatsAppProvider } from './providers/whatsapp'
+import type { MetaWhatsAppProvider } from './providers/meta-whatsapp'
 import { DiskStorageProvider } from './providers/storage'
 import { getOcrProvider } from './providers/ocr'
 import { getSttProvider } from './providers/stt'
+import { getEvolutionConfig, getMetaWhatsAppConfig, getWhatsAppProvider } from './config'
 
 export type InboundMessage = {
   id?: string
@@ -30,7 +33,11 @@ export class InboundRouter {
 
   async handle(msg: InboundMessage, provider?: WhatsAppProvider) {
     const phone = normalizePhone(msg.from)
-    const user = await this.users.getOrCreateByPhone(phone)
+    let user = await this.users.getByPhone(phone)
+    
+    if (!user) {
+      return { ok: true as const, message: 'Número não vinculado. Conecte seu WhatsApp no dashboard.' }
+    }
 
     if (msg.id && (await this.log.existsProviderId(msg.id))) {
       return { ok: true as const, message: 'duplicated' }

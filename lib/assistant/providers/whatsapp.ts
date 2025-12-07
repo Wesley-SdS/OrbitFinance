@@ -8,7 +8,7 @@ export type InboundMessage = {
 }
 
 export interface WhatsAppProvider {
-  verifySignature?(raw: Buffer, headers: Record<string, string>): boolean
+  verifySignature?(req: any): boolean
   parseInbound(body: unknown): InboundMessage
   sendText(to: string, text: string): Promise<void>
   getMedia(url: string): Promise<{ buffer: Buffer; mime: string }>
@@ -54,10 +54,14 @@ export class WhatsAppProviderEvolution implements WhatsAppProvider {
   }
 
   async getMedia(url: string): Promise<{ buffer: Buffer; mime: string }> {
-    const res = await fetch(url, { headers: this.cfg.token ? { Authorization: `Bearer ${this.cfg.token}` } : {} })
-    if (!res.ok) throw new Error(`Failed to download media: ${res.status}`)
-    const ct = res.headers.get('content-type') || 'application/octet-stream'
-    const arr = await res.arrayBuffer()
-    return { buffer: Buffer.from(arr), mime: ct }
+    const { downloadWithRetry } = await import('../retry')
+
+    try {
+      const buffer = await downloadWithRetry(url, this.cfg.token)
+      const mime = 'application/octet-stream'
+      return { buffer, mime }
+    } catch (error) {
+      throw new Error(`Failed to download media: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    }
   }
 }

@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { AuthInteractiveBackground } from "@/components/auth-interactive-background"
 import { AuthLayout } from "@/components/auth-layout"
+import { SocialLogin } from "@/components/auth/social-login"
 import { Link, useRouter } from "@/lib/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
@@ -81,6 +82,20 @@ export default function LoginPage() {
               {isLoading ? t("auth.signingIn") : t("auth.login")}
             </Button>
           </div>
+
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">
+                {t("auth.orContinueWith")}
+              </span>
+            </div>
+          </div>
+
+          <SocialLogin />
+
           <div className="mt-4 text-center text-sm">
             {t("auth.noAccount") + " "}
             <Link href="/auth/sign-up" className="hover:text-primary underline underline-offset-4">
