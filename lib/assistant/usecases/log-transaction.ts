@@ -2,6 +2,8 @@ import { PrismaTransactionRepo, PrismaUserRepo } from '../../assistant/repositor
 import { parseAmount, parseCategory, parseDateRelative, parseDescription } from '../nlu'
 import { CategoryClassifier } from '../classifier'
 import { PostTransactionInsights } from './post-transaction-insights'
+import { smartAlerts } from '@/lib/ai/smart-alerts'
+import { prisma } from '@/lib/prisma'
 
 export class LogTransaction {
   constructor(
@@ -23,6 +25,16 @@ export class LogTransaction {
     const created = await this.txRepo.create({ userId, type: input.type, amount, occurredAt, description, categoryName: categoryName ?? undefined })
     // Post insights (async best-effort)
     try { await new PostTransactionInsights().execute({ userId, categoryId: created.categoryId, amount }) } catch {}
+
+    // Smart Alerts (async best-effort)
+    try {
+      const alerts = await smartAlerts.analyzeTransaction(created, userId, prisma)
+      if (alerts.length > 0) {
+        const highPriorityAlert = alerts.find(a => a.severity === 'high') || alerts[0]
+        console.log(`[Smart Alert] ${highPriorityAlert.type}: ${highPriorityAlert.message}`)
+      }
+    } catch {}
+
     const sign = input.type === 'INCOME' ? '+' : '-'
     const formatted = amount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
     return { ok: true as const, id: created.id, message: `Lançado: ${sign}${formatted} ${description ?? ''}`.trim() }
