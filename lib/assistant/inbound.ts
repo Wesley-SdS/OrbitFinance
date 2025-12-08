@@ -103,6 +103,36 @@ export class InboundRouter {
       }
     }
 
+    if (msg.type === 'DOCUMENT' && provider && msg.mediaUrl) {
+      try {
+        const { buffer, mime } = await provider.getMedia(msg.mediaUrl)
+
+        if (mime === 'application/pdf') {
+          const { pdfExtractor } = await import('@/lib/ai/pdf-extractor')
+          const extracted = await pdfExtractor.extractFromBuffer(buffer)
+
+          const summary = `📄 *Extrato de ${extracted.bank}*\n\n` +
+            `📅 Período: ${extracted.period.start} a ${extracted.period.end}\n` +
+            `📊 ${extracted.transactions.length} transações extraídas\n\n` +
+            `Para importar, acesse o dashboard web.`
+
+          await this.log.logOutbound({ userId: user.id, type: 'TEXT', content: summary })
+          try { await this.dispatcher.sendText(phone, summary) } catch {}
+          return this.replies.sendTextPlaceholder(phone, summary)
+        }
+
+        const info = 'Documento recebido. Para extratos PDF, acesse o dashboard.'
+        await this.log.logOutbound({ userId: user.id, type: 'TEXT', content: info })
+        try { await this.dispatcher.sendText(phone, info) } catch {}
+        return this.replies.sendTextPlaceholder(phone, info)
+      } catch (error) {
+        const info = 'Erro ao processar documento. Tente fazer upload pelo dashboard.'
+        await this.log.logOutbound({ userId: user.id, type: 'TEXT', content: info })
+        try { await this.dispatcher.sendText(phone, info) } catch {}
+        return this.replies.sendTextPlaceholder(phone, info)
+      }
+    }
+
     const text = msg.text ?? ''
     const intent = parseIntent(text)
     let reply = 'ok'
