@@ -35,6 +35,12 @@ model User {
   messageLogs       MessageLog[]
   tasks             Task[]
   events            Event[]
+  // New AI features
+  subscriptions     Subscription[]
+  financialScores   FinancialScore[]
+  challenges        Challenge[]
+  categoryFeedbacks CategoryFeedback[]
+  chatMessages      ChatMessage[]
 
   @@map("users")
 }
@@ -213,6 +219,10 @@ enum InsightType {
   budget_alert
   goal_progress
   general
+  investment_comparison
+  behavioral_pattern
+  subscription_alert
+  achievement
 }
 
 enum InsightPriority {
@@ -344,4 +354,67 @@ model AuditLog {
   @@index([userId, createdAt])
   @@index([entity, entityId])
   @@map("audit_logs")
+}
+
+// AI Features Models
+
+model Subscription {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  name        String
+  amount      Decimal  @db.Decimal(15, 2)
+  frequency   String   @default("monthly")
+  category    String?
+  lastCharge  DateTime @map("last_charge")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@map("subscriptions")
+}
+
+model FinancialScore {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  score     Int
+  factors   Json
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@map("financial_scores")
+}
+
+model Challenge {
+  id           String   @id @default(cuid())
+  userId       String   @map("user_id")
+  type         String
+  description  String
+  targetValue  Decimal? @map("target_value") @db.Decimal(15, 2)
+  currentValue Decimal? @map("current_value") @db.Decimal(15, 2)
+  status       String   @default("proposed")
+  startDate    DateTime @map("start_date") @db.Timestamptz(6)
+  endDate      DateTime @map("end_date") @db.Timestamptz(6)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@map("challenges")
+}
+
+model CategoryFeedback {
+  id                String   @id @default(cuid())
+  userId            String   @map("user_id")
+  description       String
+  originalCategory  String   @map("original_category")
+  correctedCategory String   @map("corrected_category")
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@map("category_feedbacks")
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  sessionId String   @map("session_id")
+  userId    String   @map("user_id")
+  role      String
+  content   String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@map("chat_messages")
 }
