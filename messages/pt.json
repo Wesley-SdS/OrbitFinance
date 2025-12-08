@@ -53,6 +53,9 @@
     "hasAccount": "Já tem uma conta?",
     "checkEmail": "Verifique seu e-mail",
     "emailSent": "Enviamos um e-mail de confirmação. Por favor, verifique sua caixa de entrada e clique no link para verificar sua conta.",
+    "confirmationSent": "Enviamos um link de confirmação para verificar seu endereço de e-mail.",
+    "clickLinkToActivate": "Clique no link do e-mail para ativar sua conta e começar a usar o OrbiFinance.",
+    "returnToLogin": "Voltar para o login",
     "orContinueWith": "Ou continue com"
   },
   "dashboard": {
@@ -83,6 +86,9 @@
     "title": "Transações",
     "description": "Gerencie suas receitas e despesas",
     "new": "Nova Transação",
+    "addNew": "Adicionar Nova Transação",
+    "recordNew": "Registre uma nova receita ou despesa",
+    "backToTransactions": "Voltar para Transações",
     "edit": "Editar Transação",
     "type": "Tipo",
     "transactionType": "Tipo de Transação",

@@ -1,4 +1,4 @@
-import pdfParse from "pdf-parse"
+import { PDFParse } from "pdf-parse"
 import { GoogleGenerativeAI } from "@google/generative-ai"
 
 interface ExtractedTransaction {
@@ -22,8 +22,9 @@ const geminiClient = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API
 
 export class PdfExtractorService {
   async extractText(buffer: Buffer): Promise<string> {
-    const data = await pdfParse(buffer)
-    return data.text
+    const parser = new PDFParse({ data: buffer })
+    const result = await parser.getText()
+    return result.text
   }
 
   async extractTransactions(pdfText: string): Promise<ExtractedStatement> {

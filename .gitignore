@@ -39,3 +39,9 @@ next-env.d.ts
 /meta-whatsapp-service
 /twilio-whatsapp-service
 /whatsapp-simulator
+
+# temp files (Windows)
+nul
+null
+NUL
+NULL

@@ -28,7 +28,9 @@ export class LogTransaction {
 
     // Smart Alerts (async best-effort)
     try {
-      const alerts = await smartAlerts.analyzeTransaction(created, userId, prisma)
+      const transaction = await prisma.transaction.findUnique({ where: { id: created.id } })
+      if (!transaction) throw new Error('Transaction not found')
+      const alerts = await smartAlerts.analyzeTransaction(transaction, userId, prisma)
       if (alerts.length > 0) {
         const highPriorityAlert = alerts.find(a => a.severity === 'high') || alerts[0]
         console.log(`[Smart Alert] ${highPriorityAlert.type}: ${highPriorityAlert.message}`)

@@ -1,6 +1,6 @@
 import { Transaction, Goal } from "@prisma/client"
 
-interface ScoreFactors {
+export interface ScoreFactors extends Record<string, number> {
   spendingRatio: number
   emergencyFund: number
   goalProgress: number

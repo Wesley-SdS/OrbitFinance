@@ -53,6 +53,9 @@
     "hasAccount": "Already have an account?",
     "checkEmail": "Check your email",
     "emailSent": "We've sent you a confirmation email. Please check your inbox and click the link to verify your account.",
+    "confirmationSent": "We've sent you a confirmation link to verify your email address.",
+    "clickLinkToActivate": "Click the link in the email to activate your account and start using OrbiFinance.",
+    "returnToLogin": "Return to login",
     "orContinueWith": "Or continue with"
   },
   "dashboard": {
@@ -83,6 +86,9 @@
     "title": "Transactions",
     "description": "Manage your income and expenses",
     "new": "New Transaction",
+    "addNew": "Add New Transaction",
+    "recordNew": "Record a new income or expense",
+    "backToTransactions": "Back to Transactions",
     "edit": "Edit Transaction",
     "type": "Type",
     "amount": "Amount",

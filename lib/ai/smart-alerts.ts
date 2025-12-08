@@ -158,7 +158,7 @@ export class SmartAlertsService {
     const duplicateAlert = this.detectDuplicateCharge(transaction, recentTransactions)
     if (duplicateAlert) alerts.push(duplicateAlert)
 
-    const similarTransactions = categoryHistory.filter((t) => {
+    const similarTransactions = categoryHistory.filter((t: Transaction) => {
       const descSimilarity =
         (t.description || "")
           .toLowerCase()

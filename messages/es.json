@@ -53,6 +53,9 @@
     "hasAccount": "¿Ya tienes una cuenta?",
     "checkEmail": "Revisa tu correo",
     "emailSent": "Te hemos enviado un correo de confirmación. Por favor, revisa tu bandeja de entrada y haz clic en el enlace para verificar tu cuenta.",
+    "confirmationSent": "Te hemos enviado un enlace de confirmación para verificar tu dirección de correo electrónico.",
+    "clickLinkToActivate": "Haz clic en el enlace del correo para activar tu cuenta y comenzar a usar OrbiFinance.",
+    "returnToLogin": "Volver al inicio de sesión",
     "orContinueWith": "O continúa con"
   },
   "dashboard": {
@@ -83,6 +86,9 @@
     "title": "Transacciones",
     "description": "Gestiona tus ingresos y gastos",
     "new": "Nueva Transacción",
+    "addNew": "Agregar Nueva Transacción",
+    "recordNew": "Registra un nuevo ingreso o gasto",
+    "backToTransactions": "Volver a Transacciones",
     "edit": "Editar Transacción",
     "type": "Tipo",
     "amount": "Monto",

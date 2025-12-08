@@ -4,9 +4,11 @@ import { TransactionFormClient } from "@/components/transaction-form-client"
 import { Link } from "@/lib/navigation"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
+import { getTranslations } from "next-intl/server"
 
 export default async function NewTransactionPage() {
   const session = await getSession()
+  const t = await getTranslations("transactions")
 
   if (!session?.user) {
     redirect("/auth/login")
@@ -18,11 +20,11 @@ export default async function NewTransactionPage() {
         <Button variant="ghost" asChild className="mb-4">
           <Link href="/dashboard/transactions">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Transactions
+            {t("backToTransactions")}
           </Link>
         </Button>
-        <h1 className="text-3xl font-bold">Add New Transaction</h1>
-        <p className="text-muted-foreground">Record a new income or expense</p>
+        <h1 className="text-3xl font-bold">{t("addNew")}</h1>
+        <p className="text-muted-foreground">{t("recordNew")}</p>
       </div>
 
       <div className="bg-card p-6 rounded-lg border">
